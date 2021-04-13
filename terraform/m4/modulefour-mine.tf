@@ -104,6 +104,28 @@ resource "aws_route_table_association" "rta-subnet2" {
 }
 
 # SECURITY GROUPS #
+
+resource "aws_security_group" "elb-sg" {
+  name   = "nginx_elb_sg"
+  vpc_id = aws_vpc.vpc.id
+
+  # HTTP access from anywhere
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # outbound internet access
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 # Nginx security group 
 resource "aws_security_group" "nginx-sg" {
   name   = "nginx_sg"
@@ -122,7 +144,7 @@ resource "aws_security_group" "nginx-sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.network_address_space]
   }
 
   # outbound internet access
@@ -131,6 +153,23 @@ resource "aws_security_group" "nginx-sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Load balancer
+
+resource "aws_elb" "web" {
+  name = "nginx-elb"
+
+  subnets         = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
+  security_groups = [aws_security_group.elb-sg.id]
+  instances       = [aws_instance.nginx1.id, aws_instance.nginx2.id]
+
+  listener {
+    instance_port     = 80
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
   }
 }
 
@@ -188,5 +227,5 @@ resource "aws_instance" "nginx2" {
 ##################################################################################
 
 output "aws_instance_public_dns" {
-  value = [aws_instance.nginx1.public_dns, aws_instance.nginx2.public_dns]
+  value = [aws_instance.nginx1.public_dns, aws_instance.nginx2.public_dns, aws_elb.web.dns_name]
 }
