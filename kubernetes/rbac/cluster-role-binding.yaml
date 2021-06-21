@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: dev1-all-namespaces-resources-reader
+subjects:
+- kind: ServiceAccount
+  name: dev1 # Name is case sensitive
+  namespace: default # Needs to be added only for service accounts
+roleRef:
+  kind: ClusterRole
+  name: all-namespaces-resources-reader
+  apiGroup: rbac.authorization.k8s.io

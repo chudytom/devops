@@ -4,5 +4,14 @@ metadata:
   name: non-namespaced-resources-reader
 rules:
 - apiGroups: [""]
-  resources: ["node", "clusterrole", "clusterrolebinding", "namespace"]
+  resources: ["nodes", "namespaces", "persistentvolumes"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["clusterroles", "clusterrolebindings"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["networking.k8s.io"] # apiGroup needs be without /v1
+  resources: ["ingressclasses"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["csidrivers"]
   verbs: ["get", "watch", "list"]
