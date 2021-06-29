@@ -3,9 +3,7 @@ kind: ClusterRole
 metadata:
   name: single-namespace-resources-contributor
 rules:
-- api_groups = ["", "extensions", "apps", "secrets-store.csi.x-k8s.io", "metrics.k8s.io", "networking.k8s.io"]
+- api_groups = ["aadpodidentity.k8s.io", "apps", "autoscaling", "batch", "extensions", "events.k8s.io", 
+                    "networking.k8s.io", "metrics.k8s.io", "secrets-store.csi.x-k8s.io""]
   resources  = ["*"]
-  verbs      = ["*"]
-- api_groups = ["batch"]
-  resources  = ["jobs", "cronjobs"]
   verbs      = ["*"]
