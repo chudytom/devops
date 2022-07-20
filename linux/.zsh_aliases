@@ -1,0 +1,41 @@
+alias gh='history|grep'
+alias tf=terraform $*
+alias k=kubectl $*
+alias getns="kubectl config view --minify | grep namespace"
+# alias set-ns="kubectl config set-context --current --namespace$*"
+# alias example='f() { kubectl config set-context --current --namespace $1 && getns2};f && getns2'
+alias dev-blue-cluster="kubectl config use-context mnr-blue-aks-dev-we && getns2"
+alias dev-green-cluster="kubectl config use-context mnr-green-aks-dev-we && getns2"
+alias dev-blue-cluster-download="az aks get-credentials --resource-group MarketsAndRisk-DEV --name mnr-blue-aks-dev-we --subscription MarketsAndRisk --overwrite-existing && k get ns"
+alias dev-green-cluster-download="az aks get-credentials --resource-group MarketsAndRisk-DEV --name mnr-green-aks-dev-we --subscription MarketsAndRisk --overwrite-existing && k get ns"
+alias prod-blue-cluster="kubectl config use-context mnr-blue-aks-prod-we && getns2"
+alias prod-green-cluster="kubectl config use-context mnr-green-aks-prod-we && getns2"
+alias prod-blue-cluster-download="az aks get-credentials --resource-group MarketsAndRisk-PROD --name mnr-blue-aks-prod-we --subscription MarketsAndRisk --overwrite-existing && k get ns"
+alias prod-green-cluster-download="az aks get-credentials --resource-group MarketsAndRisk-PROD --name mnr-green-aks-prod-we --subscription MarketsAndRisk --overwrite-existing && k get ns"
+alias local-cluster="kubectl config use-context minikube"
+alias python=python3 $*
+
+setns() {
+  # git add .
+  # if [ "$1" != "" ] # or better, if [ -n "$1" ]
+  kubectl config set-context --current --namespace $1
+  getns2
+}
+
+
+getns2() {
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  NC='\033[0m' # No Color
+
+
+  current_ns=$(kubectl config view --minify --output=jsonpath='{.contexts[*].context.namespace}')
+  all_ns=($(kubectl get ns --no-headers=true --output=custom-columns=NAME:metadata.name))
+
+  if [[ " ${all_ns[*]} " =~ " ${current_ns} " ]]; # if all_ns contains current_ns
+  then
+    echo -e "${GREEN}Current namespace set to ${current_ns}"
+  else
+    echo "${RED}Namespace ${current_ns} does not exist"
+  fi
+}
